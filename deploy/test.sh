@@ -1,5 +1,7 @@
 #!/bin/bash
+
 set -e
+
 REPO_DIR="/mnt/c/Users/Sergo/Documents/prog/university/catty-reminders-app"
 BRANCH=$1
 
@@ -7,23 +9,38 @@ cd "$REPO_DIR"
 
 git fetch origin
 git checkout -B "$BRANCH" "origin/$BRANCH"
-git reset --hard "origin/$BRANCH"
+echo "Pull origin $BRANCH"
+git pull origin "$BRANCH"
+
+echo "Running tests"
+
+if [ ! -d ".venv" ]; then
+	echo "Virual environment was not found, creating..."
+	# python3 -m venv .venv/
+fi
 
 source .venv/bin/activate
+echo "Virtual environment activated"
 
-export PYTHONPATH=$PYTHONPATH:$(pwd)
+if [ -f "requirements.txt" ]; then
+	echo "Installing/Updating requirements"
+	# pip install -r requirements.txt
+fi
 
-echo "Running tests for branch $BRANCH..."
+echo "Starting temporary app for testing"
 
-nohup uvicorn app.main:app --host 127.0.0.1 --port 8181 > /dev/null 2>&1 &
+uvicorn app.main:app --host 127.0.0.1 --port 8181 > /tmp/catty-test.log 2>&1 &
 APP_PID=$!
 
-sleep 3
+sleep 5
 
-
-python3 -m pytest tests -v
+echo "Running pytest"
+python3 -m pytest -v
 RESULT=$?
 
-kill $APP_PID || true
+echo "Stopping temporary app"
+kill "$APP_PID" || true
 
-exit $RESULT
+echo "Tests finished"
+
+exit "$RESULT"
