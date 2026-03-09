@@ -39,7 +39,7 @@ python3 -m pytest -v
 RESULT=$?
 
 echo "Stopping temporary app"
-kill "$APP_PID"
+kill "$APP_PID" || true
 
 echo "Tests finished"
 
