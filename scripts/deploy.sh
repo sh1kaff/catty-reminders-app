@@ -13,7 +13,7 @@ if [ -z "$RELEASE_HASH" ]; then
 fi
 
 DEPLOY_PORT=${DEPLOY_PORT:-22}
-DEPLOY_DIR="/home/ct/catty-reminders-app"
+DEPLOY_DIR="/mnt/c/Users/Sergo/Documents/prog/university/catty-reminders-app"
 
 echo "Deploying to $DEPLOY_HOST:$DEPLOY_PORT"
 echo "User: $DEPLOY_USER"
