@@ -14,7 +14,6 @@ jobs:
     - name: Get image name (lowercase)
       id: img
       run: |
-        # Docker не любит заглавные буквы в названиях образов
         echo "name=$(echo "ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
     - name: Create .env file
@@ -32,7 +31,6 @@ jobs:
         username: ${{ vars.DEPLOY_USER }}
         port: ${{ vars.DEPLOY_PORT }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        # Копируем конфиг и созданный .env
         source: "docker-compose.yaml,.env"
         target: "~/catty-app"
 
@@ -48,15 +46,14 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
         script: |
           cd ~/catty-app
-          
-          # Авторизация в реестре
           echo "$DOCKER_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
           
-          # Запуск
-          docker compose pull
-          docker compose up -d --remove-orphans
+          docker compose down
           
-          # Проверка
-          echo "Checking status..."
+          docker compose pull
+
+          docker compose up -d --force-recreate
+          
+          echo "Waiting for start..."
           sleep 10
           docker compose ps
