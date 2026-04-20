@@ -3,18 +3,18 @@ version: '3.8'
 services:
   db:
     image: mariadb:10.11
-    restart: unless-stopped
+    restart: always
     environment:
       MARIADB_ROOT_PASSWORD: mypass
       MARIADB_DATABASE: catty_reminders
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
 
   app:
     image: ${IMAGE_NAME}:${IMAGE_TAG}
-    restart: unless-stopped
+    restart: always
     ports:
-      - "8181:8181"
+      - "0.0.0.0:8181:8181/tcp"
     environment:
       - DEPLOY_REF=${IMAGE_TAG}
       - DB_HOST=db
@@ -25,4 +25,4 @@ services:
       - db
 
 volumes:
-  mariadb_data:
+  db_data:
