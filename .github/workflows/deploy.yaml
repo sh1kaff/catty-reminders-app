@@ -26,6 +26,8 @@ jobs:
           username: sergo
           port: 3163
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 20m
+          timeout: 30s
           script: |
             set -e
             cd /home/sergo/catty-reminders-app
@@ -46,5 +48,9 @@ jobs:
             export CONTEINER_APP_PORT=8181
 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            echo "Pulling images..."
+            docker compose pull
             
-            docker compose up -d --pull always --remove-orphans --force-recreate
+            echo "Starting containers..."
+            docker compose up -d --remove-orphans --force-recreate
